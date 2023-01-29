@@ -9,8 +9,6 @@ Features to add:
 import ast
 import random
 
-#Hello! This message is to test Github's features!
-
 #SaveData file being opened, and its data being extracted
 with open("SaveData") as file:
     data = file.read()

@@ -6,9 +6,6 @@ Features to add:
 > All data is saved between sessions
 """
 
-#TO DO: WHEN THE WORD IS ENTERED, IT IS STORED AS ITS LOWER CASE VARIANT, AND WHEN A WORD CHOICE IS ENTERED, THE CHOICE IS SWITCHED TO ITS LOWER CASE VARIANT.
-#When the user enters a word which was already entered, ask him if wants to cancel, or edit the currently existing definition of the word.
-
 import ast
 import random
 

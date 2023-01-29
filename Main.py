@@ -1,13 +1,15 @@
 """
 Features to add:
 > You can enter a new word and its definition.
-> You can look up the word to get its definition. (After being given a full list of the already entered words) - ignore case
+> You can look up the word to get its definition.(After being given a full list of the already entered words)-ignorCase
 > You can play a quiz consisting of each of the already entered words.
 > All data is saved between sessions
 """
 
 import ast
 import random
+
+#Hello! This message is to test Github's features!
 
 #SaveData file being opened, and its data being extracted
 with open("SaveData") as file:

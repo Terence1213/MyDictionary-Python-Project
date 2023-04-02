@@ -29,17 +29,12 @@ with open("Answers.txt", 'rb') as file:
         quizAnswers = list()
         print("Error at line 31")
 
+
 # The data is saved and put into the text file
 def saveData():
-
     # The wordsEntered and wordAnswers variables are converted to json format.
     wordsEnteredJson = json.dumps(wordsEntered)
     wordAnswersJson = json.dumps(wordAnswers)
-
-    # DEBUGGING
-    for line in quizAnswers:
-        for item in line:
-            print(item)
 
     # The wordsEntered and wordAnswers variables are saved into the SaveData text file.
     with open("SaveData", 'r+') as file:
@@ -51,8 +46,8 @@ def saveData():
         file.truncate(0)
         pickle.dump(quizAnswers, file)
 
-def enterWord():
 
+def enterWord():
     # The new word is being added to the dictionary.
     print("\n------------------------------------------------------------")
     newWord = input("Please enter the new word: ").lower()
@@ -60,15 +55,26 @@ def enterWord():
     # If the user had already entered the same word before, he is given the choice of changing its definition or
     # canceling.
     if wordsEntered.__contains__(newWord):
-        choice = int(input("> The word you entered has already been entered before."
-                           "\n\nEnter 1. = Change the definition of the currently existing word"
-                           "\nEnter 2. = Cancel"
-                           "\nPlease enter your choice (1 - 2): "))
+        choice = None
+        while True:
+            error = False
+            try:
+                choice = int(input("\n> The word you entered has already been entered before."
+                                   "\n\nEnter 1. = Change the definition of the currently existing word"
+                                   "\nEnter 2. = Cancel"
+                                   "\nPlease enter your choice (1 - 2): "))
+            except ValueError:
+                print("\nPlease enter a number between 1 - 2!")
+                error = True
+
+            #If an error doesn't happen, the menu isn't re-prompted to the user.
+            if error == False:
+                break
 
         isLoopStopped = False
         while isLoopStopped == False:
             if choice == 1:
-                #The word chosen by the user, has its definition modified by the user
+                # The word chosen by the user, has its definition modified by the user
                 wordsEntered.update({newWord: input("\nPlease enter the definition of the word '" + newWord + "': ")})
 
                 # Since the word's definition has been modified, we give the user the option to clear or not clear the
@@ -81,11 +87,22 @@ def enterWord():
                         # If the answers for the word are already empty, then the program doesn't have to clear it.
                         if len(quizAnswers[wordAnswers.get(newWord)]) > 0:
                             while True:
-                                # The user chooses if he wants to clear the saved answers for his selected word or not.
-                                choice = int(input("\n\nEnter 1. = Clear the answers for the selected word whose "
-                                                   "definition was modified"
-                                                   "\nEnter 2. = Dont clear the answers"
-                                                   "\nPlease enter your choice (1 - 2): "))
+                                while True:
+                                    error = False
+                                    try:
+                                        # The user chooses if he wants to clear the saved answers for his selected word
+                                        # or not.
+                                        choice = int(input("\n\nEnter 1. = Clear the answers for the selected word "
+                                                           "whose definition was modified"
+                                                           "\nEnter 2. = Dont clear the answers"
+                                                           "\nPlease enter your choice (1 - 2): "))
+                                    except ValueError:
+                                        error = True
+                                        print("\nPlease enter a number between 1 - 2!")
+
+                                    # If an error happens, the program re - prompts the user to enter his menu choice.
+                                    if error == False:
+                                        break
                                 if choice == 1:
                                     # If 1 is chosen, the answers for the selected word are cleared.
                                     quizAnswers[wordAnswers.get(newWord)] = list()
@@ -102,7 +119,7 @@ def enterWord():
         wordsEntered.update({newWord: input("Please enter the definition of the word '" + newWord + "': ").lower()})
         # The wordAnswers is updated since a new word has been added, and so a new index must be created to represent
         # the new word.
-        wordAnswers.update({newWord : len(wordAnswers)})
+        wordAnswers.update({newWord: len(wordAnswers)})
         # The quizAnswers is appended with an empty list which can be later appended by multiple definitions.
         quizAnswers.append(list())
 
@@ -114,25 +131,64 @@ def lookUpWord():
         print("> " + key)
     print("-----------------------------------------------")
 
-    # The user enters the word of choice, and gets its definition
-    wordChoice = input("\nPlease enter the word you want the definition for (from the list): ").lower()
+    # The user enters his word of choice.
+    wordChoice = input("\nPlease enter the word you want the definition/s for (from the list): ").lower()
     wordFound = False
+
+    # The program goes through each already entered word, and if it finds the word the user typed in, the definition
+    # menu is displayed.
     for key in wordsEntered:
         if wordChoice == key:
-            print("\nDefinition of '" + key + "': " + wordsEntered.get(key))
+
             wordFound = True
+            definitionChoice = 0
+
+            while True:
+                error = False
+                # The user chooses if he wants the original definition or all previous correct user answers
+                try:
+                    print("\n-------------------------------------------")
+                    definitionChoice = int(input("Enter 1. = Get original definition"
+                                                 "\nEnter 2. = Get all previous (correct) user answers"
+                                                 "\nPlease enter your choice from the given menu: "))
+                except ValueError:
+                    print("\nPlease enter a number between 1 - 2!")
+                    error = True
+
+                # If the error is not true, then the menu is not re-prompted to the user.
+                if error == False:
+                    break
+
+            #If the user chooses 1, the original definition of the chosen word is displayed.
+            if definitionChoice == 1:
+                print("\nDefinition of '" + key + "': " + wordsEntered.get(key))
+                break
+
+            #If the user chooses 2, all the previous (correct) answers of the user are displayed.
+            if definitionChoice == 2:
+                print("\n------------------------------------------------------------")
+                for definition in quizAnswers[wordAnswers.get(wordChoice)]:
+                    print("> " + definition)
 
     if wordFound == False:
         print("The word you entered wasn't found in the database!")
 
 
-#The user chooses whether he will be given the word, or the definition in the quiz.
+# The user chooses whether he will be given the word, or the definition in the quiz.
 def quizMenu():
+    choice = 0
+    error = False
 
-    # The user chooses whether he will be given the word, or the definition in the quiz.
-    choice = int(input("\nEnter 1. = Word based quiz"
-                       "\nEnter 2. = Definition based quiz"
-                       "\nPlease enter your choice: (1 - 2): "))
+    while error == True:
+        try:
+            # The user chooses whether he will be given the word, or the definition in the quiz.
+            choice = int(input("\nEnter 1. = Word based quiz"
+                               "\nEnter 2. = Definition based quiz"
+                               "\nPlease enter your choice: (1 - 2): "))
+            error = False
+        except ValueError:
+            error = True
+            print("Please enter a number between 1 - 2!")
 
     while True:
         if choice == 1:
@@ -144,9 +200,9 @@ def quizMenu():
 
     quiz(isWordQuiz)
 
+
 # A quiz consisting of each word already entered into the program. - The questions are always in a randomised order.
 def quiz(isWord):
-
     # Typecasts the dictionary's keys into a list, so that they can be shuffled
     keys = list(wordsEntered.keys())
     random.shuffle(keys)
@@ -157,9 +213,9 @@ def quiz(isWord):
     for key in keys:
         shuffledWords.update({key: wordsEntered.get(key)})
 
-    #This variable is used to calculate how much of the questions the user gotten correct.
+    # This variable is used to calculate how much of the questions the user gotten correct.
     score = 0
-    #This variable is used to calculate how many questiosn the user answers.
+    # This variable is used to calculate how many questions the user answers.
     questionsAnswered = 0
 
     print("\nENTER QUIT AT ANYTIME IF YOU WANT TO CANCEL THE QUIZ")
@@ -168,17 +224,17 @@ def quiz(isWord):
     # quiz mode.
 
     if isWord:
-        #For each word in the database the question will be asked
+        # For each word in the database the question will be asked
         for index, key in enumerate(shuffledWords):
             print("--------------------------------------------------")
             answer = input(f"({index}/{len(shuffledWords)}) - What is the definition of the word: {key}?: ").lower()
             if answer == "quit":
                 break
 
-            #Each time a questions is asked in the quiz, this variable is incremented by one.
+            # Each time a questions is asked in the quiz, this variable is incremented by one.
             questionsAnswered += 1
 
-            #The answer is initially set to incorrect.
+            # The answer is initially set to incorrect.
             answerCorrect = False
 
             # The program goes through each word in wordAnswers.
@@ -189,7 +245,7 @@ def quiz(isWord):
                     # answers for the current word.
                     for definition in quizAnswers[wordAnswers.get(key)]:
                         # If the user's answer matches any of the previously entered answers for the current word, his
-                        # answer is instantly / autmatically set to correct.
+                        # answer is instantly / automatically set to correct.
                         if answer == definition:
                             answerCorrect = True
                         else:
@@ -201,7 +257,7 @@ def quiz(isWord):
                 score += 1
                 print("\nYour answer is correct!")
             else:
-                #if the program doesn't find the answer, it asks the user if he thinks that his answer is correct.
+                # if the program doesn't find the answer, it asks the user if he thinks that his answer is correct.
                 print("\nYour answer: " + answer)
                 print("Correct answer: " + shuffledWords.get(key))
 
@@ -220,9 +276,9 @@ def quiz(isWord):
                         break
 
     elif not isWord:
-        #For each word in the database the question will be asked
+        # For each word in the database the question will be asked
         for index, key in enumerate(shuffledWords):
-            #The user is prompted to answer the question
+            # The user is prompted to answer the question
             print("--------------------------------------------------")
             answer = input(f"({index}/{len(shuffledWords)}) - What is the word coming from the definition:"
                            f"\n> {shuffledWords.get(key)}"
@@ -238,7 +294,7 @@ def quiz(isWord):
             print("\nYour answer: " + answer)
             print("Correct answer: " + key)
 
-            #If the user's answer matches to the word corresponding to the given definition, the user gains score.
+            # If the user's answer matches to the word corresponding to the given definition, the user gains score.
             if answer == key:
                 print("Result: Correct!")
                 score += 1
@@ -261,7 +317,11 @@ def menu():
         print("Enter 4. = Quit")
         print("-----------------------------------------------")
 
-        choice = int(input("Enter your choice (1 - 4): "))
+        try:
+            choice = int(input("Enter your choice (1 - 4): "))
+        except ValueError:
+            print("\nPlease enter a number between 1 - 4!")
+            continue
         if (choice == 1):
             # The user enters a new word into the program's database.
             enterWord()
@@ -278,7 +338,7 @@ def menu():
             else:
                 print("A word hasn't been entered into the database yet!")
         elif (choice == 4):
-            #The program is closed after all data is saved.
+            # The program is closed after all data is saved.
             saveData()
             break
         else:
